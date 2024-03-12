@@ -1,60 +1,23 @@
-use std::{collections::HashMap, thread};
+use std::collections::HashMap;
 
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 
-use crate::{
-    cache::{
-        file_cache::{create_cache_file, read_and_invalid_cache_file},
-        CacheConfigs,
-    },
-    error::print_warning,
-};
+use crate::currency::Currency;
 
-use super::{ApiEndpoints, Currency};
+use super::ApiEndpoints;
 
 pub async fn get_exchange_rates(source: Currency) -> Result<HashMap<String, f64>, String> {
-    let cached_response =
-        read_and_invalid_cache_file(CacheConfigs::ExchangeRates, Some(source.clone()));
-    match cached_response {
-        Ok(cached_response) => Ok(cached_response),
-        Err(e) => {
-            print_warning(&e.to_string());
+    let endpoint = ApiEndpoints::ExchangeRate;
+    let response: Result<CurrencyRatesApiResponse, reqwest::Error> =
+        endpoint.request(Some(source)).await;
 
-            let endpoint = ApiEndpoints::ExchangeRate;
-            let url = endpoint.get_url() + source.get_code().as_str();
-
-            let response = reqwest::get(&url).await;
-
-            let response = match response {
-                Ok(response) => response.json::<CurrencyRatesApiResponse>().await,
-                Err(e) => {
-                    return Err(e.to_string());
-                }
-            };
-
-            let rates = match response {
-                Ok(response) => {
-                    let conversion_rates = response.conversion_rates.clone();
-                    thread::spawn(move || {
-                        let _ = create_cache_file(
-                            &conversion_rates,
-                            CacheConfigs::ExchangeRates,
-                            Some(source),
-                        );
-                    });
-                    response.conversion_rates
-                }
-                Err(e) => {
-                    return Err(e.to_string());
-                }
-            };
-
-            Ok(rates)
-        }
+    match response {
+        Ok(response) => Ok(response.conversion_rates),
+        Err(e) => Err(e.to_string()),
     }
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Serialize, Debug, Clone)]
 struct CurrencyRatesApiResponse {
     conversion_rates: HashMap<String, f64>,
 }

@@ -1,4 +1,5 @@
-use crate::api::Currency;
+use crate::currency::Currency;
+
 
 pub enum ValidationType {
     Amount,

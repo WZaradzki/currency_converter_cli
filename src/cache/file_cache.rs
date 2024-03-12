@@ -1,14 +1,14 @@
 use chrono::{DateTime, Utc};
 
-
 use serde::Serialize;
 use serde_json::to_string_pretty;
+use core::panic;
 use std::io::{self, Result};
 use std::{fs, path::Path};
 
-use crate::api::Currency;
+use crate::currency::Currency;
 
-use super::CacheConfigs;
+use super::{CacheConfigs, CACHE_DIR};
 
 pub fn create_cache_file<T: Serialize>(
     serializable: &T,
@@ -68,7 +68,7 @@ pub fn read_and_invalid_cache_file<T: for<'de> serde::Deserialize<'de>>(
 
         if created_time.is_err() {
             return Err(io::Error::new(
-                io::ErrorKind::NotFound,
+                io::ErrorKind::Other,
                 "Cache file is expired",
             ));
         }
@@ -77,7 +77,7 @@ pub fn read_and_invalid_cache_file<T: for<'de> serde::Deserialize<'de>>(
 
         if created_time.is_err() {
             return Err(io::Error::new(
-                io::ErrorKind::NotFound,
+                io::ErrorKind::Other,
                 "Cache file is expired",
             ));
         }
@@ -89,7 +89,7 @@ pub fn read_and_invalid_cache_file<T: for<'de> serde::Deserialize<'de>>(
 
         if hours_parsed.is_none() {
             return Err(io::Error::new(
-                io::ErrorKind::InvalidInput,
+                io::ErrorKind::Other,
                 "Invalid cache lifetime",
             ));
         }
@@ -99,7 +99,7 @@ pub fn read_and_invalid_cache_file<T: for<'de> serde::Deserialize<'de>>(
         if cache_time < created_time {
             fs::remove_file(entry_path).unwrap();
             return Err(io::Error::new(
-                io::ErrorKind::NotFound,
+                io::ErrorKind::Other,
                 "Cache file is expired",
             ));
         }
@@ -117,4 +117,20 @@ pub fn read_and_invalid_cache_file<T: for<'de> serde::Deserialize<'de>>(
         io::ErrorKind::NotFound,
         "No cache file found",
     ))
+}
+
+pub async fn rest_cache() -> Result<()> {
+    let cache_folder = fs::read_dir(CACHE_DIR);
+
+    match cache_folder {
+        Ok(_) => {
+            let remove = fs::remove_dir_all(CACHE_DIR);
+
+            match remove {
+                Ok(_) => Ok(()),
+                Err(e) => Err(e),
+            }
+        }
+        Err(e) => return Err(e),
+    }
 }

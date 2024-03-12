@@ -1,16 +1,14 @@
-
 use std::thread;
-
-use serde::{Deserialize, Serialize};
 
 use crate::{
     cache::{
         file_cache::{create_cache_file, read_and_invalid_cache_file},
         CacheConfigs,
     },
-    error::print_warning,
+    currency::Currency,
 };
 
+pub mod currencies;
 pub mod exchange_rate;
 
 enum ApiEndpoints {
@@ -33,95 +31,60 @@ impl ApiEndpoints {
         }
     }
 
-    pub fn get_url(&self) -> String {
-        self.prepare_url()
-    }
-}
-
-pub async fn get_supported_currencies() -> Result<Vec<Currency>, reqwest::Error> {
-    let endpoint = ApiEndpoints::SupportedCurrencies;
-    let url = endpoint.get_url();
-
-    let cached_response = read_and_invalid_cache_file(CacheConfigs::Currencies, None);
-    match cached_response {
-        Ok(cached_response) => Ok(cached_response),
-        Err(e) => {
-            print_warning(&e.to_string());
-            // panic!("cached_response:");
-
-            let response = reqwest::get(&url).await;
-
-            let response = match response {
-                Ok(response) => response.json::<ApiResponse>().await,
-                Err(e) => {
-                    return Err(e);
-                }
-            };
-
-            let currencies = match response {
-                Ok(response) => {
-                    let supported_codes_clone = response.supported_codes.clone();
-                    thread::spawn(move || {
-                        let _ = create_cache_file(
-                            &supported_codes_clone,
-                            CacheConfigs::Currencies,
-                            None,
-                        );
-                    });
-                    response.supported_codes
-                }
-                Err(e) => {
-                    return Err(e);
-                }
-            };
-
-            Ok(currencies)
-        }
-    }
-}
-
-#[derive(Deserialize, Serialize, Debug)]
-struct ApiResponse {
-    result: String,
-    documentation: String,
-    terms_of_use: String,
-    supported_codes: Vec<Currency>,
-}
-#[derive(Deserialize, Serialize, Debug, Clone, PartialEq)]
-pub struct Currency {
-    code: String,
-    name: Option<String>,
-}
-impl Currency {
-    pub fn new_from_code(code: String) -> Currency {
-        Currency {
-            code: code.to_uppercase(),
-            name: None,
+    fn get_cache_config(&self) -> CacheConfigs {
+        match self {
+            ApiEndpoints::SupportedCurrencies => CacheConfigs::Currencies,
+            ApiEndpoints::ExchangeRate => CacheConfigs::ExchangeRates,
         }
     }
 
-    pub fn get_code(&self) -> &String {
-        &self.code
-    }
-
-    pub fn get_name(&self) -> &String {
-        let name = self.name.as_ref();
-        if name.is_none() {
-            &self.code
-        } else {
-            name.unwrap()
+    pub fn get_url(&self, currency: Option<Currency>) -> String {
+        let url = self.prepare_url();
+        match currency {
+            Some(currency) => format!("{}/{}", url, currency.get_code()),
+            None => url,
         }
     }
-}
 
-#[derive(Deserialize, Serialize, Debug)]
-struct ApiError {
-    result: String,
-    error_type: ErrorType,
-}
-#[derive(Deserialize, Serialize, Debug)]
-enum ErrorType {
-    InvalidKey,
-    InactiveAccount,
-    QuotaReached,
+    pub async fn request<
+        T: for<'de> serde::Deserialize<'de> + serde::Serialize + Clone + Send + 'static,
+    >(
+        &self,
+        currency: Option<Currency>,
+    ) -> Result<T, reqwest::Error> {
+        let cached_response =
+            read_and_invalid_cache_file(self.get_cache_config(), currency.clone());
+
+        match cached_response {
+            Ok(cached_response) => Ok(cached_response),
+            Err(e) => {
+                println!("{}", e.to_string());
+
+                let response = reqwest::get(&self.get_url(currency)).await;
+
+                let response = match response {
+                    Ok(response) => response.json::<T>().await,
+                    Err(e) => {
+                        return Err(e);
+                    }
+                };
+
+                let currencies = match response {
+                    Ok(response) => {
+                        let cloned_response = response.clone();
+                        thread::spawn(move || {
+                            let _ =
+                                create_cache_file(&cloned_response, CacheConfigs::Currencies, None);
+                        });
+                        response
+                    }
+                    Err(e) => {
+                        return Err(e);
+                    }
+                };
+
+                Ok(currencies)
+            }
+        }
+    }
 }

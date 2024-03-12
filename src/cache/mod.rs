@@ -1,7 +1,8 @@
-use crate::api::Currency;
+use crate::currency::Currency;
 
 pub mod file_cache;
 
+pub const CACHE_DIR: &str = "cache";
 pub enum CacheConfigs {
     Currencies,
     ExchangeRates,
@@ -10,11 +11,9 @@ pub enum CacheConfigs {
 impl CacheConfigs {
     pub fn get_config(&self, currency: Option<Currency>) -> CacheConfig {
         match self {
-            CacheConfigs::Currencies => {
-                CacheConfig::new(72, "cache/currencies".to_string(), currency)
-            }
+            CacheConfigs::Currencies => CacheConfig::new(72, "currencies".to_string(), currency),
             CacheConfigs::ExchangeRates => {
-                CacheConfig::new(1, "cache/exchange_rates".to_string(), currency)
+                CacheConfig::new(1, "exchange_rates".to_string(), currency)
             }
         }
     }
@@ -33,7 +32,7 @@ impl CacheConfig {
     ) -> CacheConfig {
         CacheConfig {
             lifetime_in_hours,
-            dir_name,
+            dir_name: CACHE_DIR.to_owned() + "/" + &dir_name,
             currency,
         }
     }

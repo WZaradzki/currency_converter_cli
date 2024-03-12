@@ -2,7 +2,11 @@ use colored::Colorize;
 use futures::future::join_all;
 
 use crate::{
-    api::get_supported_currencies, conversion::convert, currency::get_rate, error::print_error, validation::{validate, ValidationType}
+    cache::file_cache::rest_cache,
+    conversion::convert,
+    currency::{get_rate, get_supported_currencies, get_supported_currencies_with_rates},
+    error::print_error,
+    validation::{validate, ValidationType},
 };
 pub mod interactive_mode;
 
@@ -20,6 +24,7 @@ pub enum Action {
         message: String,
     },
     ListCurrencies,
+    ListCurrenciesWithRates,
 }
 
 impl Action {
@@ -35,6 +40,7 @@ impl Action {
             Action::Help => println!("Printing help"),
             Action::Error { message } => println!("{} {}", "Error:".red().bold(), &message.red()),
             Action::ListCurrencies => println!("Listing supported currencies"),
+            Action::ListCurrenciesWithRates => println!("Listing supported currencies with rates"),
         }
     }
 
@@ -109,6 +115,25 @@ impl Action {
                     }
                 }
             }
+            Action::ListCurrenciesWithRates => {
+                let supported_currencies_with_rates = get_supported_currencies_with_rates().await;
+
+                match supported_currencies_with_rates {
+                    Ok(currencies) => {
+                        for currency in currencies {
+                            for (code, rates) in currency {
+                                println!("{}", code.green());
+                                for (target, rate) in rates {
+                                    println!("  {} - {}", target, rate);
+                                }
+                            }
+                        }
+                    }
+                    Err(e) => {
+                        print_error(e.to_string().as_str());
+                    }
+                }
+            }
             Action::DirectConversion {
                 source,
                 target,
@@ -121,11 +146,11 @@ impl Action {
                     Ok(rate) => {
                         let conversion_results = convert(amount, rate);
                         println!(
-                            "{} {} = {} {}  // rate: {}",
-                            amount,
-                            source,
+                            "{} {} = {} {}  // exchange rate: {}",
+                            amount.to_string().bold(),
+                            source.to_uppercase(),
                             conversion_results.to_string().green(),
-                            target,
+                            target.to_uppercase(),
                             rate.to_string().yellow()
                         );
                     }
@@ -134,9 +159,31 @@ impl Action {
                     }
                 }
             }
-            // Action::UpdateCache => {
-            //     crate::api::update_cache().await;
-            // }
+            Action::UpdateCache => {
+                let reset_cache_folders = rest_cache().await;
+
+                match reset_cache_folders {
+                    Ok(_) => {
+                        println!("Cache folders reset");
+                    }
+                    Err(e) => {
+                        print_error(
+                            format!("Failed to reset cache folders: {}", e.to_string()).as_str(),
+                        );
+                    }
+                }
+
+                let supported_currencies_with_rates = get_supported_currencies_with_rates().await;
+
+                match supported_currencies_with_rates {
+                    Ok(_) => {
+                        println!("Cache updated");
+                    }
+                    Err(e) => {
+                        print_error(format!("Failed to update cache: {}", e.to_string()).as_str());
+                    }
+                }
+            }
             _ => {
                 println!("Not implemented");
             }
@@ -160,6 +207,8 @@ pub async fn parse_cli_arguments(args: Vec<String>) -> Action {
     if args.len() == 2 {
         match args[1].as_str() {
             "listCurrencies" => return Action::ListCurrencies,
+            "listCurrenciesWithRates" => return Action::ListCurrenciesWithRates,
+            "updateCache" => return Action::UpdateCache,
             "help" => return Action::Help,
             _ => {
                 return Action::Error {
