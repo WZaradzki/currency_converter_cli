@@ -2,7 +2,6 @@ use chrono::{DateTime, Utc};
 
 use serde::Serialize;
 use serde_json::to_string_pretty;
-use core::panic;
 use std::io::{self, Result};
 use std::{fs, path::Path};
 

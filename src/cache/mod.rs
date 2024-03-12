@@ -3,6 +3,8 @@ use crate::currency::Currency;
 pub mod file_cache;
 
 pub const CACHE_DIR: &str = "cache";
+
+#[derive(Clone)]
 pub enum CacheConfigs {
     Currencies,
     ExchangeRates,

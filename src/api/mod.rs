@@ -52,15 +52,13 @@ impl ApiEndpoints {
         &self,
         currency: Option<Currency>,
     ) -> Result<T, reqwest::Error> {
-        let cached_response =
-            read_and_invalid_cache_file(self.get_cache_config(), currency.clone());
+        let cache_config = self.get_cache_config();
+        let cached_response = read_and_invalid_cache_file(cache_config.clone(), currency.clone());
 
         match cached_response {
             Ok(cached_response) => Ok(cached_response),
-            Err(e) => {
-                println!("{}", e.to_string());
-
-                let response = reqwest::get(&self.get_url(currency)).await;
+            Err(_) => {
+                let response = reqwest::get(&self.get_url(currency.clone())).await;
 
                 let response = match response {
                     Ok(response) => response.json::<T>().await,
@@ -73,8 +71,7 @@ impl ApiEndpoints {
                     Ok(response) => {
                         let cloned_response = response.clone();
                         thread::spawn(move || {
-                            let _ =
-                                create_cache_file(&cloned_response, CacheConfigs::Currencies, None);
+                            let _ = create_cache_file(&cloned_response, cache_config, currency);
                         });
                         response
                     }

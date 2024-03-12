@@ -31,16 +31,12 @@ impl Action {
     fn info_print(&self) {
         match self {
             Action::InteractiveMode => println!("Running in interactive mode"),
-            Action::DirectConversion {
-                source,
-                target,
-                amount,
-            } => println!("Converting {} {} to {}", amount, source, target),
             Action::UpdateCache => println!("Updating cache"),
             Action::Help => println!("Printing help"),
             Action::Error { message } => println!("{} {}", "Error:".red().bold(), &message.red()),
             Action::ListCurrencies => println!("Listing supported currencies"),
             Action::ListCurrenciesWithRates => println!("Listing supported currencies with rates"),
+            _ => (),
         }
     }
 
