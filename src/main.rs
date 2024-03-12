@@ -3,7 +3,9 @@ use currency_converter_cli::{cli::parse_cli_arguments, utils::config::check_conf
 #[tokio::main]
 async fn main() -> () {
     if check_config() {
-        parse_cli_arguments(std::env::args().collect()).await.run();
+        let action = parse_cli_arguments(std::env::args().collect()).await;
+        
+        action.execute().await;
     } else {
         std::process::exit(1);
     }
