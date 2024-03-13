@@ -72,17 +72,24 @@ impl Action {
     fn into_help_print_interactive_mode(&self) {
         match self {
             Action::DirectConversion { .. } => println!(
-                "{} {} - {}",
+                "{} - {}",
                 "direct-conversion".green(),
-                "source target amount".green(),
-                "Convert currency"
+                "Direct conversion"
             ),
-            Action::UpdateCache => println!("{}", "update-cache".green()),
-            Action::Help => println!("{}", "help".green()),
-            Action::ListCurrencies => println!("{}", "list-currencies".green()),
-            Action::ListCurrenciesWithRates => println!("{}", "list-currencies-with-rates".green()),
-            Action::Setup => println!("{}", "setup".green()),
-            Action::History => println!("{}", "history".green()),
+            Action::UpdateCache => println!("{} - {}", "update-cache".green(), "Update cache"),
+            Action::Help => println!("{} - {}", "help".green(), "Print help"),
+            Action::ListCurrencies => println!(
+                "{} - {}",
+                "list-currencies".green(),
+                "List supported currencies"
+            ),
+            Action::ListCurrenciesWithRates => println!(
+                "{} - {}",
+                "list-currencies-with-rates".green(),
+                "List supported currencies with rates"
+            ),
+            Action::Setup => println!("{} - {}", "setup".green(), "Setup application"),
+            Action::History => println!("{} - {}", "history".green(), "Display history"),
             _ => (),
         }
     }
@@ -165,7 +172,14 @@ impl Action {
                 "history".green(),
                 "Display history"
             ),
-            _ => (),
+            Action::DirectConversion { .. } => println!(
+                "{} {}  - {} /// Example: {}",
+                "-d".green(),
+                "direct-conversion".green(),
+                "Direct conversion",
+                "direct-conversion USD PLN 100".green()
+            ),
+            Action::Error { .. } => (),
         }
     }
 
@@ -182,7 +196,6 @@ impl Action {
             Action::InteractiveMode => println!("Running in interactive mode"),
             Action::UpdateCache => println!("Updating cache"),
             Action::Help => println!("Printing help"),
-            Action::Error { message } => println!("{} {}", "Error:".red().bold(), &message.red()),
             Action::ListCurrencies => println!("Listing supported currencies"),
             Action::ListCurrenciesWithRates => println!("Listing supported currencies with rates"),
             _ => (),
@@ -217,7 +230,6 @@ impl Action {
             Action::History => display_history().await,
             Action::Help => Action::print_help(),
             Action::InteractiveMode => start_interactive_mode().await,
-            _ => print_error("Not implemented yet"),
         }
     }
 
@@ -244,7 +256,8 @@ pub async fn parse_cli_arguments(args: Vec<String>) -> Action {
     }
 
     return Action::Error {
-        message: "No arguments provided".to_string(),
+        message: "Invalid number of arguments, use -h to see the list of available commands"
+            .to_string(),
     };
 }
 

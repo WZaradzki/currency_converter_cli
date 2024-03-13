@@ -6,7 +6,7 @@ use super::ApiEndpoints;
 
 pub async fn get_supported_currencies_from_api() -> Result<Vec<Currency>, String> {
     let endpoint = ApiEndpoints::SupportedCurrencies;
-    let response: Result<ApiResponse, reqwest::Error> = endpoint.request(None).await;
+    let response: Result<ApiResponse, String> = endpoint.request(None).await;
 
     match response {
         Ok(response) => Ok(response.supported_codes),

@@ -31,8 +31,6 @@ impl ApiEndpoints {
         }
     }
 
-    
-
     fn get_cache_config(&self) -> CacheConfigs {
         match self {
             ApiEndpoints::SupportedCurrencies => CacheConfigs::Currencies,
@@ -53,7 +51,7 @@ impl ApiEndpoints {
     >(
         &self,
         currency: Option<Currency>,
-    ) -> Result<T, reqwest::Error> {
+    ) -> Result<T, String> {
         let cache_config = self.get_cache_config();
 
         let cached_response = read_and_invalid_cache_file(cache_config.clone(), currency.clone());
@@ -64,13 +62,25 @@ impl ApiEndpoints {
                 let response = reqwest::get(&self.get_url(currency.clone())).await;
 
                 let response = match response {
-                    Ok(response) => response.json::<T>().await,
+                    Ok(response) => {
+                        if response.status().is_client_error() {
+                            let response = response.json::<ErrorResponse>().await;
+
+                            return Err(format!(
+                                "Exchange API: {}",
+                                response.unwrap().error_type.to_string()
+                            ));
+                        }
+
+                        let response = response.json::<T>().await;
+                        response
+                    }
                     Err(e) => {
-                        return Err(e);
+                        return Err(e.to_string());
                     }
                 };
 
-                let currencies = match response {
+                let results = match response {
                     Ok(response) => {
                         let cloned_response = response.clone();
                         thread::spawn(move || {
@@ -79,12 +89,20 @@ impl ApiEndpoints {
                         response
                     }
                     Err(e) => {
-                        return Err(e);
+                        dbg!(e.to_string());
+                        return Err(e.to_string());
                     }
                 };
 
-                Ok(currencies)
+                Ok(results)
             }
         }
     }
+}
+
+#[derive(serde::Deserialize, serde::Serialize, Debug, Clone)]
+pub struct ErrorResponse {
+    result: String,
+    #[serde(rename = "error-type")]
+    error_type: String,
 }

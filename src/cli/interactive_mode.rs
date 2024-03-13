@@ -12,7 +12,7 @@ pub async fn start_interactive_mode() {
 
     let mut input = String::new();
     loop {
-        println!("Enter a command or 'exit' to quit:");
+        println!("Enter a command or 'exit' to quit // Type 'help' to see the list of available commands:");
         input.clear();
         io::stdin().read_line(&mut input).unwrap();
         let input = input.trim();
