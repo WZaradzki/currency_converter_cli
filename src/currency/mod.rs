@@ -79,7 +79,8 @@ pub async fn get_supported_currencies_with_rates(
             let mut currencies_with_rates: Vec<HashMap<String, HashMap<String, f64>>> = vec![];
             for (index, currency) in currencies.iter().enumerate() {
                 print_info(&format!(
-                    "Getting exchange rates for currency {} of {}",
+                    "Getting exchange rates for currency {} // {} of {}",
+                    currency.get_code(),
                     index + 1,
                     currencies.len()
                 ));
