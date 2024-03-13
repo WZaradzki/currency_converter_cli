@@ -42,12 +42,11 @@ pub async fn validate_args(
 ) -> Result<(), String> {
     let supported_currencies = get_supported_currencies().await;
 
-    let supported_currencies = match supported_currencies {
-        Ok(currencies) => currencies,
-        Err(_) => {
-            return Err("Failed to get supported currencies".to_string());
-        }
-    };
+    if supported_currencies.is_err() {
+        return Ok(()); // we can't validate the currencies, validation will be transferred to api call
+    }
+
+    let supported_currencies = supported_currencies.unwrap();
 
     let validations = vec![
         validate(&amount, ValidationType::Amount, None),

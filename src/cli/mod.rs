@@ -71,11 +71,9 @@ impl Action {
 
     fn into_help_print_interactive_mode(&self) {
         match self {
-            Action::DirectConversion { .. } => println!(
-                "{} - {}",
-                "direct-conversion".green(),
-                "Direct conversion"
-            ),
+            Action::DirectConversion { .. } => {
+                println!("{} - {}", "direct-conversion".green(), "Direct conversion")
+            }
             Action::UpdateCache => println!("{} - {}", "update-cache".green(), "Update cache"),
             Action::Help => println!("{} - {}", "help".green(), "Print help"),
             Action::ListCurrencies => println!(
@@ -103,6 +101,11 @@ impl Action {
 
     fn get_all_actions() -> Vec<Action> {
         vec![
+            Action::DirectConversion {
+                source: "".to_string(),
+                target: "".to_string(),
+                amount: "".to_string(),
+            },
             Action::InteractiveMode,
             Action::UpdateCache,
             Action::Help,
@@ -110,11 +113,7 @@ impl Action {
             Action::ListCurrenciesWithRates,
             Action::Setup,
             Action::History,
-            Action::DirectConversion {
-                source: "".to_string(),
-                target: "".to_string(),
-                amount: "".to_string(),
-            },
+         
         ]
     }
 
@@ -147,7 +146,7 @@ impl Action {
                 "update-cache".green(),
                 "Update cache"
             ),
-            Action::Help => println!("{} {} - {}", "-h".green(), "--help".green(), "Print help"),
+            Action::Help => println!("{} {} - {}", "-h".green(), "help".green(), "Print help"),
             Action::ListCurrencies => println!(
                 "{} {} - {}",
                 "-l".green(),
@@ -168,17 +167,15 @@ impl Action {
             ),
             Action::History => println!(
                 "{} {} - {}",
-                "-h".green(),
+                "-H".green(),
                 "history".green(),
                 "Display history"
             ),
-            Action::DirectConversion { .. } => println!(
-                "{} {}  - {} /// Example: {}",
-                "-d".green(),
-                "direct-conversion".green(),
-                "Direct conversion",
-                "direct-conversion USD PLN 100".green()
-            ),
+            Action::DirectConversion { .. } => {
+                println!("{}", "Default use - Direct conversion".green());
+                println!("<source currency> <target currency> <amount> // Example: USD EUR 1000");
+                println!("");
+            }
             Action::Error { .. } => (),
         }
     }
@@ -195,7 +192,6 @@ impl Action {
         match self {
             Action::InteractiveMode => println!("Running in interactive mode"),
             Action::UpdateCache => println!("Updating cache"),
-            Action::Help => println!("Printing help"),
             Action::ListCurrencies => println!("Listing supported currencies"),
             Action::ListCurrenciesWithRates => println!("Listing supported currencies with rates"),
             _ => (),

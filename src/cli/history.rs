@@ -6,7 +6,7 @@ pub async fn display_history() {
         Ok(history_commands) => {
             for command in history_commands {
                 println!(
-                    "{}: {} // time: {}",
+                    "Command: {} || Output: {} || time: {}",
                     command.get_command(),
                     command.get_output(),
                     command.get_timestamp()
