@@ -117,7 +117,7 @@ impl ErrorResponse {
             "invalid-key" => "Invalid API key".to_string(),
             "unsupported-code" => "Unsupported currency code".to_string(),
             "malformed-request" => "Malformed request".to_string(),
-            "inactive-account" => "Inactive account".to_string(),
+            "inactive-account" => "Inactive account / check the api key".to_string(),
             "quota-reached" => {
                 "Your account has reached the the number of requests allowed by your plan"
                     .to_string()
