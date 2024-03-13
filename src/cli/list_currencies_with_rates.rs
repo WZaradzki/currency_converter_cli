@@ -9,9 +9,18 @@ pub async fn display_supported_currencies_with_rates() {
             for currency in currencies {
                 for (code, rates) in currency {
                     println!("{}", code.green());
-                    for (target, rate) in rates {
-                        println!("  {} - {}", target, rate);
+                    for (index, (target, rate)) in rates.iter().enumerate() {
+                        if index == 0 || index % 5 == 0{
+                            print!("{}: {}", target.yellow(), rate);
+                        } else {
+                            print!(" {}: {}", target.yellow(), rate);
+                        }
+                        if (index + 1) % 5 == 0 {
+                            println!("");
+                        }
                     }
+                    println!("");
+                    println!("");
                 }
             }
         }
