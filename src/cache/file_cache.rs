@@ -14,16 +14,14 @@ pub fn create_cache_file<T: Serialize>(
     cache_config: CacheConfigs,
     currency: Option<Currency>,
 ) -> Result<()> {
-    let json = to_string_pretty(serializable)?;
-    let now = Utc::now();
-
     let config = cache_config.get_config(currency);
+    if !config.is_cache_enabled() {
+        return Err(io::Error::new(io::ErrorKind::Other, "Cache is not enabled"));
+    }
 
-    let filename = format!(
-        "{}/{}.json",
-        config.get_path(),
-        now.format("%Y-%m-%d_%H-%M-%S"),
-    );
+    let json: String = to_string_pretty(serializable)?;
+
+    let filename = format!("{}/{}.json", config.get_path(), config.get_file_name(),);
 
     let path = Path::new(&filename);
 
@@ -48,6 +46,11 @@ pub fn read_and_invalid_cache_file<T: for<'de> serde::Deserialize<'de>>(
     currency: Option<Currency>,
 ) -> Result<T> {
     let config = cache_config.get_config(currency);
+
+    if !config.is_cache_enabled() {
+        return Err(io::Error::new(io::ErrorKind::Other, "Cache is not enabled"));
+    }
+
     let dir = config.get_path();
     let path = Path::new(dir.as_str());
 

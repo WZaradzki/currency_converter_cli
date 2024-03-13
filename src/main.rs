@@ -1,12 +1,15 @@
-use currency_converter_cli::{cli::parse_cli_arguments, utils::config::check_config};
+use currency_converter_cli::{
+    cli::{missing_config, parse_cli_arguments},
+    utils::config::health_check,
+};
 
 #[tokio::main]
 async fn main() -> () {
-    if check_config() {
+    if health_check() {
         let action = parse_cli_arguments(std::env::args().collect()).await;
-        
+
         action.execute().await;
     } else {
-        std::process::exit(1);
+        missing_config().await;
     }
 }

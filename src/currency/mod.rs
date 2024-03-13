@@ -7,6 +7,8 @@ use crate::{
     error::print_info,
 };
 
+pub mod history;
+
 #[derive(Deserialize, Serialize, Debug, Clone, PartialEq)]
 pub struct Currency {
     code: String,

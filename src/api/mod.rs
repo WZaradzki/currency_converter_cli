@@ -31,6 +31,8 @@ impl ApiEndpoints {
         }
     }
 
+    
+
     fn get_cache_config(&self) -> CacheConfigs {
         match self {
             ApiEndpoints::SupportedCurrencies => CacheConfigs::Currencies,
@@ -53,6 +55,7 @@ impl ApiEndpoints {
         currency: Option<Currency>,
     ) -> Result<T, reqwest::Error> {
         let cache_config = self.get_cache_config();
+
         let cached_response = read_and_invalid_cache_file(cache_config.clone(), currency.clone());
 
         match cached_response {
