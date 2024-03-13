@@ -66,10 +66,14 @@ impl ApiEndpoints {
                         if response.status().is_client_error() {
                             let response = response.json::<ErrorResponse>().await;
 
-                            return Err(format!(
-                                "Exchange API: {}",
-                                response.unwrap().error_type.to_string()
-                            ));
+                            match response {
+                                Ok(response) => {
+                                    return Err(response.to_string());
+                                }
+                                Err(e) => {
+                                    return Err(e.to_string());
+                                }
+                            }
                         }
 
                         let response = response.json::<T>().await;
@@ -105,4 +109,20 @@ pub struct ErrorResponse {
     result: String,
     #[serde(rename = "error-type")]
     error_type: String,
+}
+
+impl ErrorResponse {
+    pub fn to_string(&self) -> String {
+        match self.error_type.as_str() {
+            "invalid-key" => "Invalid API key".to_string(),
+            "unsupported-code" => "Unsupported currency code".to_string(),
+            "malformed-request" => "Malformed request".to_string(),
+            "inactive-account" => "Inactive account".to_string(),
+            "quota-reached" => {
+                "Your account has reached the the number of requests allowed by your plan"
+                    .to_string()
+            }
+            _ => "Unknown error".to_string(),
+        }
+    }
 }
