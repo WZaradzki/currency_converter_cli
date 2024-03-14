@@ -11,7 +11,7 @@ use crate::{
 pub mod currencies;
 pub mod exchange_rate;
 
-enum ApiEndpoints {
+pub enum ApiEndpoints {
     SupportedCurrencies,
     ExchangeRate,
 }
