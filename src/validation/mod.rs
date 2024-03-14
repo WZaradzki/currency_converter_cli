@@ -7,21 +7,21 @@ pub enum ValidationType {
 }
 
 pub async fn validate(
-    currency: &String,
+    val: &String,
     validation_type: ValidationType,
     supported_currencies: Option<&Vec<Currency>>,
 ) -> Result<(), String> {
     return match validation_type {
         ValidationType::Amount => {
-            if currency.parse::<f64>().is_ok() {
+            if val.parse::<f64>().is_ok() {
                 Ok(())
             } else {
-                Err(format!("{} is not a valid number", currency))
+                Err(format!("{} is not a valid number", val))
             }
         }
         ValidationType::Currency => {
             let supported_currencies = supported_currencies.unwrap();
-            let currency = currency.to_uppercase();
+            let currency = val.to_uppercase();
 
             if supported_currencies
                 .iter()

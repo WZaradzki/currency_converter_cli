@@ -1,5 +1,6 @@
 use std::collections::HashMap;
 
+use futures::future::join_all;
 use serde::{Deserialize, Serialize};
 
 use crate::{
@@ -77,25 +78,28 @@ pub async fn get_supported_currencies_with_rates(
     match currencies {
         Ok(currencies) => {
             let mut currencies_with_rates: Vec<HashMap<String, HashMap<String, f64>>> = vec![];
-            for (index, currency) in currencies.iter().enumerate() {
-                print_info(&format!(
-                    "Getting exchange rates for currency {} // {} of {}",
-                    currency.get_code(),
-                    index + 1,
-                    currencies.len()
-                ));
 
-                let rates = get_exchange_rates(currency.clone()).await;
+            let get_rates_functions = currencies.iter().map(|currency| {
+                let currency_code = currency.get_code().clone();
+                async move {
+                    let rates = get_exchange_rates(currency.clone()).await;
+                    (currency_code, rates)
+                }
+            });
 
-                match rates {
-                    Ok(rates) => {
+            let results = join_all(get_rates_functions).await;
+
+            for result in results {
+                match result {
+                    (currency_code, Ok(rates)) => {
                         let mut currency_with_rates = HashMap::new();
-                        currency_with_rates.insert(currency.get_code().to_string(), rates);
+                        currency_with_rates.insert(currency_code, rates);
                         currencies_with_rates.push(currency_with_rates);
                     }
-                    Err(e) => return Err(e),
+                    (_, Err(e)) => return Err(e),
                 }
             }
+
             Ok(currencies_with_rates)
         }
         Err(e) => Err(e),
