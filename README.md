@@ -92,7 +92,6 @@ target/release/currency_converter_cli update-cache
 target/release/currency_converter_cli -u
 ```
 
-
 ## Testing
 
 ### Prerequisites
