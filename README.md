@@ -5,6 +5,18 @@
 This guide covers the initial setup for the currency conversion application.
 
 
+## Docker
+
+### Build 
+```shell
+docker-compose up -d
+```
+
+### RUN 
+```shell
+docker run -it currency_converter_cli-cli /bin/bash 
+```
+
 ## Build
 
 This section provides a simplified guide on how to build the currency conversion application from source.
