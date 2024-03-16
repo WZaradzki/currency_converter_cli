@@ -9,6 +9,11 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    env:
+      API_URL: ${{ secrets.API_KEY }}
+      CURRENCY_CACHE_TIME_IN_HOURS: 24
+      CURRENCY_RATE_CACHE_TIME_IN_HOURS: 1
+      CCOMMAND_HISTORY_CACHE_TIME_IN_HOURS: 72
 
     steps:
     - name: Checkout code
@@ -24,8 +29,3 @@ jobs:
       run: |
         cargo build --verbose
         cargo test --verbose
-      env:
-         API_URL: ${{ secrets.API_KEY }}
-         CURRENCY_CACHE_TIME_IN_HOURS: 24
-         CURRENCY_RATE_CACHE_TIME_IN_HOURS: 1
-         CCOMMAND_HISTORY_CACHE_TIME_IN_HOURS: 72
