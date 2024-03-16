@@ -9,6 +9,11 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    env:
+      API_URL: "12312"
+      CURRENCY_CACHE_TIME_IN_HOURS: 24
+      CURRENCY_RATE_CACHE_TIME_IN_HOURS: 1
+      COMMAND_HISTORY_CACHE_TIME_IN_HOURS: 72
 
     steps:
     - name: Checkout code
@@ -22,12 +27,13 @@ jobs:
 
     - name: Build, format, lint & test code
       run: |
+        echo "API_URL=$API_URL" >> .env
+        echo "CURRENCY_CACHE_TIME_IN_HOURS=$CURRENCY_CACHE_TIME_IN_HOURS" >> .env
+        echo "CURRENCY_RATE_CACHE_TIME_IN_HOURS=$CURRENCY_RATE_CACHE_TIME_IN_HOURS" >> .env
+        echo "COMMAND_HISTORY_CACHE_TIME_IN_HOURS=$COMMAND_HISTORY_CACHE_TIME_IN_HOURS" >> .env
+        
         cargo build --verbose
         cargo fmt --verbose
         cargo clippy --verbose
         cargo test --verbose
-      env:
-        API_URL: "12312"
-        CURRENCY_CACHE_TIME_IN_HOURS: 24
-        CURRENCY_RATE_CACHE_TIME_IN_HOURS: 1
-        COMMAND_HISTORY_CACHE_TIME_IN_HOURS: 72
+     
