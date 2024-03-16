@@ -25,7 +25,7 @@ Exec docker - replace `<id/name>` with CONTAINER_ID or NAMES of currency_convert
 docker exec -it <id/name> /bin/bash 
 ```
 
-## Build
+## Local Build
 
 This section provides a simplified guide on how to build the currency conversion application from source.
 
