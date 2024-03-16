@@ -10,7 +10,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
     env:
-      API_URL: ${{ secrets.API_KEY }}
+      API_URL: "12312"
       CURRENCY_CACHE_TIME_IN_HOURS: 24
       CURRENCY_RATE_CACHE_TIME_IN_HOURS: 1
       CCOMMAND_HISTORY_CACHE_TIME_IN_HOURS: 72
