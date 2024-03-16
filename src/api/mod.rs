@@ -18,7 +18,7 @@ pub enum ApiEndpoints {
 
 impl ApiEndpoints {
     fn prepare_url(&self) -> String {
-        // dotenv::dotenv().ok();
+        dotenv::dotenv().ok();
         let api_key: String = std::env::var("API_KEY").unwrap();
 
         match self {
