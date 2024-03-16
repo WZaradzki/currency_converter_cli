@@ -25,7 +25,9 @@ jobs:
         profile: minimal
         toolchain: stable
 
-    - name: Build and test code
+    - name: Build, format, lint & test code
       run: |
         cargo build --verbose
+        cargo fmt --quiet
+        cargo clippy --quiet
         cargo test --verbose
