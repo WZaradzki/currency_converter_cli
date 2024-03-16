@@ -12,9 +12,17 @@ This guide covers the initial setup for the currency conversion application.
 docker-compose up -d
 ```
 
-### RUN 
+Check, if container has been ran correctly. 
 ```shell
-docker run -it currency_converter_cli-cli /bin/bash 
+docker ps
+```
+
+### RUN 
+
+Exec docker - replace `<id/name>` with CONTAINER_ID or NAMES of currency_converter_cli-cli container
+
+```shell
+docker exec -it <id/name> /bin/bash 
 ```
 
 ## Build
@@ -41,6 +49,14 @@ This section provides a simplified guide on how to build the currency conversion
 
 - The application performs a health check at startup to verify the presence of an `.env` file with the necessary environment variables. If the `.env` file does not exist or lacks required variables, the application will prompt for setup. Alternatively, you can initiate setup manually with `-s` or `setup`.
 
+Docker
+
+```shell
+./cli -s
+```
+
+Local
+
 ```shell
 target/release/currency_converter_cli -s
 ```
@@ -57,6 +73,14 @@ target/release/currency_converter_cli -s
 - Three command-line arguments - `<source currency> <target currency> <amount>`
 - Perform a direct conversion: `USD EUR 100`. Converts 100 USD to EUR at the current exchange rate. All supported currency codes at [Codes](https://www.exchangerate-api.com/docs/supported-currencies)
 
+Docker
+
+```shell
+./cli USD EUR 100
+```
+
+Local
+
 ```shell
 target/release/currency_converter_cli USD EUR 100
 ```
@@ -64,26 +88,76 @@ target/release/currency_converter_cli USD EUR 100
 ## Commands
 
 - **interactive-mode**: Start interactive mode.
+
+Docker
+
+```shell
+./cli interactive-mode
+./cli -i
+```
+
+Local
+
 ```shell
 target/release/currency_converter_cli interactive-mode
 target/release/currency_converter_cli -i
 ```
 - **help**: List all available commands and descriptions.
+
+Docker
+
+```shell
+./cli help
+./cli -h
+```
+
+Local
+
 ```shell
 target/release/currency_converter_cli help
 target/release/currency_converter_cli -h
 ```
 - **list-currencies**: Show all supported currencies.
+
+Docker
+
+```shell
+./cli list-currencies
+./cli -l
+```
+
+Local
+
 ```shell
 target/release/currency_converter_cli list-currencies
 target/release/currency_converter_cli -l
 ```
 - **list-currencies-with-rates**: Show all supported currencies with current exchange rates.
+
+Docker
+
+```shell
+./cli list-currencies-with-rates
+./cli -lr
+```
+
+Local
+
 ```shell
 target/release/currency_converter_cli list-currencies-with-rates
 target/release/currency_converter_cli -lr
 ```
 - **history**: Display the history of currency conversions. Useful for reviewing past activities.
+
+Docker
+
+```shell
+./cli history
+./cli -H
+```
+
+Local
+
 ```shell
 target/release/currency_converter_cli history
 target/release/currency_converter_cli -H
@@ -93,12 +167,32 @@ target/release/currency_converter_cli -H
 ## Config Commands
 
 - **setup**: Initialize the application setup.
+
+Docker
+
+```shell
+./cli setup
+./cli -s
+```
+
+Local
+
 ```shell
 target/release/currency_converter_cli setup
 target/release/currency_converter_cli -s
 ```
 
 - **update-cache**: Update the cache with the latest currency exchange rates.
+
+Docker
+
+```shell
+./cli update-cache
+./cli -u
+```
+
+Local
+
 ```shell
 target/release/currency_converter_cli update-cache
 target/release/currency_converter_cli -u

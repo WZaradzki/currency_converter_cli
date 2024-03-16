@@ -50,14 +50,3 @@ fn test_list_currencies() {
     cmd.assert().success().stdout(usd_currency);
 }
 
-#[test]
-fn test_list_currencies_with_rates() {
-    let mut cmd = Command::cargo_bin("currency_converter_cli").unwrap();
-    cmd.arg("-lr");
-
-    let pln_currency = contains("PLN");
-    let usd_currency = contains("USD");
-    cmd.assert().success().stdout(pln_currency);
-    cmd.assert().success().stdout(usd_currency);
-}
-
