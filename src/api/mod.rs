@@ -19,7 +19,7 @@ pub enum ApiEndpoints {
 impl ApiEndpoints {
     fn prepare_url(&self) -> String {
         dotenv::dotenv().ok();
-        let api_key: String = std::env::var("API_KEY").unwrap();
+        let api_key: String = std::env::var("API_KEY").unwrap_or_default();
 
         match self {
             ApiEndpoints::SupportedCurrencies => {
