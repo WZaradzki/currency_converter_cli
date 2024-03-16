@@ -16,11 +16,11 @@ pub async fn display_supported_currencies_with_rates() {
                             print!(" {}: {}", target.yellow(), rate);
                         }
                         if (index + 1) % 5 == 0 {
-                            println!("");
+                            println!(" ");
                         }
                     }
-                    println!("");
-                    println!("");
+                    println!(" ");
+                    println!(" ");
                 }
             }
         }

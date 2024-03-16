@@ -11,7 +11,7 @@ pub async fn update_cache() {
             println!("Cache folders reset");
         }
         Err(e) => {
-            print_error(format!("Failed to reset cache folders: {}", e.to_string()).as_str());
+            print_error(format!("Failed to reset cache folders: {}", e).as_str());
         }
     }
 
@@ -22,7 +22,7 @@ pub async fn update_cache() {
             println!("Cache updated");
         }
         Err(e) => {
-            print_error(format!("{}", e.to_string()).as_str());
+            print_error(e.to_string().as_str());
         }
     }
 }

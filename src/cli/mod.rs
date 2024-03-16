@@ -55,39 +55,33 @@ impl Action {
     fn get_interactive_mode_actions() -> Vec<Action> {
         Action::get_all_actions()
             .into_iter()
-            .filter(|action| match action {
-                Action::InteractiveMode => false,
-                _ => true,
-            })
+            .filter(|action| !matches!(action, Action::InteractiveMode))
             .collect::<Vec<Action>>()
     }
 
     fn print_help_interactive_mode() {
         let actions = Action::get_interactive_mode_actions();
         for action in actions {
-            action.into_help_print_interactive_mode();
+            action.help_print_interactive_mode();
         }
     }
 
-    fn into_help_print_interactive_mode(&self) {
+    fn help_print_interactive_mode(&self) {
         match self {
             Action::DirectConversion { .. } => {
-                println!("{} - {}", "direct-conversion".green(), "Direct conversion")
+                println!("{} - Direct conversion", "direct-conversion".green())
             }
-            Action::UpdateCache => println!("{} - {}", "update-cache".green(), "Update cache"),
-            Action::Help => println!("{} - {}", "help".green(), "Print help"),
-            Action::ListCurrencies => println!(
-                "{} - {}",
-                "list-currencies".green(),
-                "List supported currencies"
-            ),
+            Action::UpdateCache => println!("{} - Update cache", "update-cache".green()),
+            Action::Help => println!("{} - Print help", "help".green()),
+            Action::ListCurrencies => {
+                println!("{} - List supported currencies", "list-currencies".green(),)
+            }
             Action::ListCurrenciesWithRates => println!(
-                "{} - {}",
+                "{} - List supported currencies with rates",
                 "list-currencies-with-rates".green(),
-                "List supported currencies with rates"
             ),
-            Action::Setup => println!("{} - {}", "setup".green(), "Setup application"),
-            Action::History => println!("{} - {}", "history".green(), "Display history"),
+            Action::Setup => println!("{} - Setup application", "setup".green()),
+            Action::History => println!("{} - Display history", "history".green()),
             _ => (),
         }
     }
@@ -95,7 +89,7 @@ impl Action {
     fn print_help() {
         let actions = Action::get_all_actions();
         for action in actions {
-            action.into_help_print();
+            action.help_print();
         }
     }
 
@@ -113,12 +107,11 @@ impl Action {
             Action::ListCurrenciesWithRates,
             Action::Setup,
             Action::History,
-         
         ]
     }
 
-    fn new_from_single_argument(arg: &String) -> Action {
-        match arg.as_str() {
+    fn new_from_single_argument(arg: &str) -> Action {
+        match arg {
             "-i" | "interactive" => Action::InteractiveMode,
             "-u" | "update-cache" => Action::UpdateCache,
             "-h" | "help" => Action::Help,
@@ -132,49 +125,35 @@ impl Action {
         }
     }
 
-    fn into_help_print(&self) {
+    fn help_print(&self) {
         match self {
             Action::InteractiveMode => println!(
-                "{} {} - {}",
+                "{} {} - Run in interactive mode",
                 "-i".green(),
                 "interactive".green(),
-                "Run in interactive mode"
             ),
-            Action::UpdateCache => println!(
-                "{} {} - {}",
-                "-u".green(),
-                "update-cache".green(),
-                "Update cache"
-            ),
-            Action::Help => println!("{} {} - {}", "-h".green(), "help".green(), "Print help"),
+            Action::UpdateCache => {
+                println!("{} {} - Update cache", "-u".green(), "update-cache".green(),)
+            }
+            Action::Help => println!("{} {} - Print help", "-h".green(), "help".green()),
             Action::ListCurrencies => println!(
-                "{} {} - {}",
+                "{} {} - List supported currencies",
                 "-l".green(),
                 "list-currencies".green(),
-                "List supported currencies"
             ),
             Action::ListCurrenciesWithRates => println!(
-                "{} {} - {}",
+                "{} {} - List supported currencies with rates",
                 "-lr".green(),
                 "list-currencies-with-rates".green(),
-                "List supported currencies with rates"
             ),
-            Action::Setup => println!(
-                "{} {} - {}",
-                "-s".green(),
-                "setup".green(),
-                "Setup application"
-            ),
-            Action::History => println!(
-                "{} {} - {}",
-                "-H".green(),
-                "history".green(),
-                "Display history"
-            ),
+            Action::Setup => println!("{} {} - Setup application", "-s".green(), "setup".green(),),
+            Action::History => {
+                println!("{} {} - Display history", "-H".green(), "history".green(),)
+            }
             Action::DirectConversion { .. } => {
                 println!("{}", "Default use - Direct conversion".green());
                 println!("<source currency> <target currency> <amount> // Example: USD EUR 1000");
-                println!("");
+                println!(" ");
             }
             Action::Error { .. } => (),
         }
@@ -199,14 +178,14 @@ impl Action {
     }
 
     async fn validate(&self) -> Result<(), String> {
-        return match self {
+        match self {
             Action::DirectConversion {
                 source,
                 target,
                 amount,
             } => validate_args(source, target, amount).await,
             _ => Ok(()),
-        };
+        }
     }
 
     async fn run(&self) {
@@ -251,10 +230,10 @@ pub async fn parse_cli_arguments(args: Vec<String>) -> Action {
         return Action::new_direct_conversion(args[1].clone(), args[2].clone(), args[3].clone());
     }
 
-    return Action::Error {
+    Action::Error {
         message: "Invalid number of arguments, use -h to see the list of available commands"
             .to_string(),
-    };
+    }
 }
 
 pub async fn missing_config() {

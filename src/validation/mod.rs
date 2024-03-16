@@ -1,6 +1,5 @@
 use crate::currency::Currency;
 
-
 pub enum ValidationType {
     Amount,
     Currency,
@@ -11,7 +10,7 @@ pub async fn validate(
     validation_type: ValidationType,
     supported_currencies: Option<&Vec<Currency>>,
 ) -> Result<(), String> {
-    return match validation_type {
+    match validation_type {
         ValidationType::Amount => {
             if val.parse::<f64>().is_ok() {
                 Ok(())
@@ -32,5 +31,5 @@ pub async fn validate(
                 Err(format!("{} is not a valid currency", currency))
             }
         }
-    };
+    }
 }

@@ -4,7 +4,7 @@ use currency_converter_cli::{
 };
 
 #[tokio::main]
-async fn main() -> () {
+async fn main() {
     if health_check() {
         let action = parse_cli_arguments(std::env::args().collect()).await;
 

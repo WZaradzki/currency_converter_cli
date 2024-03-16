@@ -133,6 +133,6 @@ pub async fn rest_cache() -> Result<()> {
                 Err(e) => Err(e),
             }
         }
-        Err(e) => return Err(e),
+        Err(e) => Err(e),
     }
 }

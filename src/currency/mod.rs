@@ -29,10 +29,10 @@ impl Currency {
 
     pub fn get_name(&self) -> &String {
         let name = self.name.as_ref();
-        if name.is_none() {
-            &self.code
+        if let Some(name) = name {
+            name
         } else {
-            name.unwrap()
+            &self.code
         }
     }
 }

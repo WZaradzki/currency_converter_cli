@@ -11,13 +11,13 @@ pub async fn setup_app() {
 
         let read = std::io::stdin().read_line(&mut input);
 
-        if read.is_err() {
-            print_error("Failed to read input");
+        if read.is_ok() {
+            input = input.trim().to_string();
         } else {
-            read.unwrap();
+            print_error("Failed to read input");
         }
 
-        if input.to_lowercase().contains("y") {
+        if input.to_lowercase().contains('y') {
             let reset = remove_env_file();
 
             if reset.is_err() {

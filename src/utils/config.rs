@@ -29,7 +29,7 @@ const ENV_VARS_WITH_DESCRIPTION: [(&str, &str, &str); 4] = [
 ];
 
 pub fn health_check() -> bool {
-    if check_is_env_file_exist() && check_env_file_has_vars().is_ok_and(|x| x == true) {
+    if check_is_env_file_exist() && check_env_file_has_vars().is_ok_and(|x| x) {
         return true;
     }
 
@@ -74,7 +74,7 @@ pub fn check_config() -> Result<(), String> {
                 Ok(())
             }
             Err(e) => {
-                return Err(e.to_string());
+                Err(e.to_string())
             }
         }
     } else {
@@ -93,7 +93,7 @@ pub fn check_config() -> Result<(), String> {
                             Ok(())
                         }
                         Err(e) => {
-                            return Err(e.to_string());
+                            Err(e.to_string())
                         }
                     }
                 } else {
@@ -101,7 +101,7 @@ pub fn check_config() -> Result<(), String> {
                 }
             }
             Err(e) => {
-                return Err(e);
+                Err(e)
             }
         }
     }
@@ -128,13 +128,11 @@ fn write_env_var(key: &str, value_type: &str, file: &mut File) -> io::Result<()>
     let mut var_value = String::new();
     let read_line = io::stdin().read_line(&mut var_value);
 
-    if read_line.is_err() {
-        return Err(io::Error::new(io::ErrorKind::Other, "Failed to read input"));
+    if read_line.is_ok() {
+        var_value = var_value.trim().to_string();
     } else {
-        read_line.unwrap();
+        return Err(io::Error::new(io::ErrorKind::Other, "Failed to read input"));
     }
-
-    var_value = var_value.trim().to_string();
 
     if var_value.is_empty() {
         return Err(io::Error::new(
@@ -165,7 +163,7 @@ fn write_env_var(key: &str, value_type: &str, file: &mut File) -> io::Result<()>
     Ok(())
 }
 
-fn check_type(value: &String, value_type: &str) -> Result<(), String> {
+fn check_type(value: &str, value_type: &str) -> Result<(), String> {
     match value_type {
         "String" => Ok(()),
         "u32" => match value.parse::<u32>() {

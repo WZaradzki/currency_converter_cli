@@ -1,4 +1,4 @@
-use std::thread;
+use std::{fmt, thread};
 
 use crate::{
     cache::{
@@ -76,8 +76,7 @@ impl ApiEndpoints {
                             }
                         }
 
-                        let response = response.json::<T>().await;
-                        response
+                        response.json::<T>().await
                     }
                     Err(e) => {
                         return Err(e.to_string());
@@ -111,18 +110,19 @@ pub struct ErrorResponse {
     error_type: String,
 }
 
-impl ErrorResponse {
-    pub fn to_string(&self) -> String {
-        match self.error_type.as_str() {
-            "invalid-key" => "Invalid API key".to_string(),
-            "unsupported-code" => "Unsupported currency code".to_string(),
-            "malformed-request" => "Malformed request".to_string(),
-            "inactive-account" => "Inactive account / check the api key".to_string(),
+impl fmt::Display for ErrorResponse {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        let message = match self.error_type.as_str() {
+            "invalid-key" => "Invalid API key",
+            "unsupported-code" => "Unsupported currency code",
+            "malformed-request" => "Malformed request",
+            "inactive-account" => "Inactive account / check the api key",
             "quota-reached" => {
-                "Your account has reached the the number of requests allowed by your plan"
-                    .to_string()
+                "Your account has reached the number of requests allowed by your plan"
             }
-            _ => "Unknown error".to_string(),
-        }
+            _ => "Unknown error",
+        };
+
+        write!(f, "{}", message)
     }
 }

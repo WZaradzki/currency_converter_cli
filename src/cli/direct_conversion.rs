@@ -7,7 +7,7 @@ use crate::{
 use colored::Colorize;
 use futures::future::join_all;
 
-pub async fn display_direct_conversion(source: &String, target: &String, amount: &String) {
+pub async fn display_direct_conversion(source: &String, target: &String, amount: &str) {
     let rate = get_rate(source, target).await;
     let amount = amount.parse::<f64>().unwrap();
 
@@ -49,14 +49,14 @@ pub async fn validate_args(
     let supported_currencies = supported_currencies.unwrap();
 
     let validations = vec![
-        validate(&amount, ValidationType::Amount, None),
+        validate(amount, ValidationType::Amount, None),
         validate(
-            &source,
+            source,
             ValidationType::Currency,
             Some(&supported_currencies),
         ),
         validate(
-            &target,
+            target,
             ValidationType::Currency,
             Some(&supported_currencies),
         ),
