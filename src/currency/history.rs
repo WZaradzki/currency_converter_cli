@@ -52,9 +52,7 @@ impl CommandHistory {
 
         match result {
             Ok(_) => Ok(()),
-            Err(e) => {
-                Err(e.to_string())
-            }
+            Err(e) => Err(e.to_string()),
         }
     }
 

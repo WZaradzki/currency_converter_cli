@@ -10,7 +10,7 @@ pub async fn display_supported_currencies_with_rates() {
                 for (code, rates) in currency {
                     println!("{}", code.green());
                     for (index, (target, rate)) in rates.iter().enumerate() {
-                        if index == 0 || index % 5 == 0{
+                        if index == 0 || index % 5 == 0 {
                             print!("{}: {}", target.yellow(), rate);
                         } else {
                             print!(" {}: {}", target.yellow(), rate);

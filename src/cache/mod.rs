@@ -14,8 +14,8 @@ pub enum CacheConfigs {
 
 impl CacheConfigs {
     pub fn get_config(&self, currency: Option<Currency>) -> CacheConfig {
-        dotenv::dotenv().ok();
-       
+        // dotenv::dotenv().ok();
+
         match self {
             CacheConfigs::Currencies => {
                 let now = Utc::now();

@@ -73,9 +73,7 @@ pub fn check_config() -> Result<(), String> {
                 print_info(".env file created successfully");
                 Ok(())
             }
-            Err(e) => {
-                Err(e.to_string())
-            }
+            Err(e) => Err(e.to_string()),
         }
     } else {
         let check_env_vars = check_env_file_has_vars();
@@ -92,17 +90,13 @@ pub fn check_config() -> Result<(), String> {
                             print_info("Environment variables added successfully");
                             Ok(())
                         }
-                        Err(e) => {
-                            Err(e.to_string())
-                        }
+                        Err(e) => Err(e.to_string()),
                     }
                 } else {
                     Ok(())
                 }
             }
-            Err(e) => {
-                Err(e)
-            }
+            Err(e) => Err(e),
         }
     }
 }

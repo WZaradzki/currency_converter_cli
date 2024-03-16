@@ -23,7 +23,7 @@ pub async fn setup_app() {
             if reset.is_err() {
                 print_error("Failed to reset configuration");
             }
-            
+
             match check_config() {
                 Ok(_) => print_info("Configuration set up"),
                 Err(e) => {

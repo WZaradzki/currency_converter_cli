@@ -97,7 +97,10 @@ mod tests {
 
     #[tokio::test]
     async fn test_interactive_mode_parse_args() {
-        let interactive_mode_args = vec!["currency_converter_cli".to_string(), "interactive".to_string()];
+        let interactive_mode_args = vec![
+            "currency_converter_cli".to_string(),
+            "interactive".to_string(),
+        ];
 
         let action = parse_cli_arguments(interactive_mode_args).await;
 
